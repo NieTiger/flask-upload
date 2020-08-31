@@ -1,4 +1,6 @@
 import os
+import socket
+
 from flask import Flask, flash, request, redirect, url_for
 from werkzeug.utils import secure_filename
 
@@ -7,6 +9,19 @@ ALLOWED_EXTENSIONS = {"txt", "md", "pdf", "png", "jpg", "jpeg", "gif", "mp4", "m
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+
+def get_ip():
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # doesn't even have to be reachable
+        s.connect(("10.255.255.255", 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = "127.0.0.1"
+    finally:
+        s.close()
+    return IP
 
 
 def allowed_file(filename):
@@ -54,4 +69,5 @@ def uploaded_file():
 
 
 if __name__ == "__main__":
+    print("Local IP address of this device: ", get_ip(), end="\n\n")
     app.run(host="0.0.0.0", port=5000)
