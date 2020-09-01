@@ -1,7 +1,8 @@
 import os
+import secrets
 import socket
 
-from flask import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = "./uploads"
@@ -9,6 +10,8 @@ ALLOWED_EXTENSIONS = {"txt", "md", "pdf", "png", "jpg", "jpeg", "gif", "mp4", "m
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024 * 1024  # Limit upload size to 1GB
+app.secret_key = secrets.token_urlsafe(32)
 
 
 def get_ip():
@@ -56,16 +59,9 @@ def upload_file():
     """
 
 
-@app.route("/uploaded_file")
-def uploaded_file():
-    return """
-    <!doctype html>
-    <title>Upload Success</title>
-    <p>Thanks for uploading {}</p>
-    <a href="/">Upload another</a>
-    """.format(
-        request.args["filename"]
-    )
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
 if __name__ == "__main__":
