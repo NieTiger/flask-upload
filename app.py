@@ -6,11 +6,11 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = "./uploads"
-ALLOWED_EXTENSIONS = {"txt", "md", "pdf", "png", "jpg", "jpeg", "gif", "mp4", "m4a"}
+ALLOWED_EXTENSIONS = {"txt", "md", "pdf", "png", "jpg", "jpeg", "gif", "mp4", "m4a", "iso"}
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-app.config["MAX_CONTENT_LENGTH"] = 1024 * 1024 * 1024  # Limit upload size to 1GB
+app.config["MAX_CONTENT_LENGTH"] = 3 * 1024 * 1024 * 1024  # Limit upload size to 3GB
 app.secret_key = secrets.token_urlsafe(32)
 
 
@@ -47,7 +47,7 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
-            return redirect(url_for("uploaded_file", filename=filename))
+            return f'Uploaded to: {url_for("uploaded_file", filename=filename)}'
     return """
     <!doctype html>
     <title>Upload new File</title>
@@ -66,4 +66,4 @@ def uploaded_file(filename):
 
 if __name__ == "__main__":
     print("Local IP address of this device: ", get_ip(), end="\n\n")
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=9998)
