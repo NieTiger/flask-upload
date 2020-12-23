@@ -6,7 +6,22 @@ from flask import Flask, flash, request, redirect, url_for, send_from_directory
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = "./uploads"
-ALLOWED_EXTENSIONS = {"txt", "md", "pdf", "png", "jpg", "jpeg", "gif", "mp4", "m4a", "iso"}
+ALLOWED_EXTENSIONS = {
+    "txt",
+    "md",
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "gif",
+    "mp4",
+    "m4a",
+    "iso",
+    "doc",
+    "docx",
+    "ppt",
+    "pptx",
+}
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -44,10 +59,13 @@ def upload_file():
         if file.filename == "":
             flash("No selected file")
             return redirect(request.url)
-        if file and allowed_file(file.filename):
+        if allowed_file(file.filename):
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
             return f'Uploaded to: {url_for("uploaded_file", filename=filename)}'
+        else:
+            return "File extensions not allowed."
+
     return """
     <!doctype html>
     <title>Upload new File</title>
